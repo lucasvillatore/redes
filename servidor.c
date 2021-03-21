@@ -118,7 +118,7 @@ int main()
 			getFileFromString(message_from_another_process);
 
 			setColorBlue();
-			printf("Command \"linha\" of \"%s\"received\n", message_from_another_process);
+			printf("Command \"linha\" \"%d\" of \"%s\" received\n", line, message_from_another_process);
 			setColorDefault();
 
 			char *linha_content;
@@ -127,7 +127,7 @@ int main()
 			
 			if (received_code != -1) {
 				//send ACK_CODE
-				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, CONTENT_SEE_FILE, file_content, NOT_SEND_LINES ,NOT_SEND_LINES);
+				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, CONTENT_SEE_FILE, linha_content, NOT_SEND_LINES ,NOT_SEND_LINES);
 			}else {
 				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Arquivo não encontrado", NOT_SEND_LINES ,NOT_SEND_LINES);
 			}

@@ -283,41 +283,31 @@ int sendMessageBiggerThenFifteenBits(int socket, int destination_address, int so
     if (isOnlyInitialLine(initial_line, end_line)){
         char *initial_line_string = concatInitialLine(message, initial_line);
 
-		send_buffer = defineProtocol(destination_address, source_address, INITIAL_AND_END_LINE, initial_line_string, sequence);
-
-        received_code = send(socket, send_buffer, sizeof(kermit_protocol_t), FLAGS);
+        received_code = sendMessage(socket, destination_address, source_address, INITIAL_AND_END_LINE, initial_line_string, sequence);
+        
         sequence++;
 
     }
     else if (isInitialLineAndEndLine(initial_line, end_line)) {
         char *initial_line_end_line = concatInitialLineAndEndLine(message, initial_line, end_line);
         
-		send_buffer = defineProtocol(destination_address, source_address, INITIAL_AND_END_LINE, initial_line_end_line, sequence);
+        received_code = sendMessage(socket, destination_address, source_address, INITIAL_AND_END_LINE, initial_line_end_line, sequence);
 
-        received_code = send(socket, send_buffer, sizeof(kermit_protocol_t), FLAGS);
         sequence++;
     }
 
 	int message_size = strlen(message);
     int cut_message = message_size >= 15 ? 15 : message_size;
-
     do{
         memset(new_message, 0, 15);
 		memcpy(new_message, message, cut_message);
 
         received_code = sendMessage(socket, destination_address, source_address, type, new_message, sequence);
-		// send_buffer = defineProtocol(destination_address, source_address, type, new_message, sequence);
 
-        // received_code = send(socket, send_buffer, sizeof(kermit_protocol_t), FLAGS);
-        // if (received_code > 0) {
-
-        //     message += 15;
-        //     message_size -= 15;
-        //     cut_message = message_size >= 15 ? 15 : message_size;
-        //     sequence++;
-        // }
-
-        // free(send_buffer);
+        message += 15;
+        message_size -= 15;
+        cut_message = message_size >= 15 ? 15 : message_size;
+        sequence++;
 
 	}while(message_size > 0);
 	
@@ -453,7 +443,6 @@ int receiveMessageFromAnotherProcess(int socket, int expected_type, char **messa
             isReceived = 1;
         }
 
-    printf("cheguei aqui\n");
     } while (!isEndTransmission(received_buffer) || isSourceExpected(received_buffer, source_expected) || !isReceived);
 
     return 1;

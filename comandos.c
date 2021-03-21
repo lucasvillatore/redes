@@ -149,6 +149,7 @@ int seeLineContentServerInClient(int line, char* file, char **buffer)
     if (!file_content) {
         return -1;
     }
+
     int lines = 0;
     char file_line_string[10];
     char line_to_append_in_buffer[270];
@@ -157,9 +158,9 @@ int seeLineContentServerInClient(int line, char* file, char **buffer)
 
     *buffer = (char *)calloc(1024 * 4, sizeof(char));
 
-    while (fgets(current_line, 256, file_content) && lines != line) {
+    while (fgets(current_line, 256, file_content)) {
         lines++;
-        if (lines >= line) {
+        if (lines == line) {
             memset(line_to_append_in_buffer, 0, 270);
             sprintf(file_line_string, "%d", lines);
             

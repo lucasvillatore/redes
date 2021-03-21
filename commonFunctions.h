@@ -120,4 +120,9 @@ int isTypeExpected(kermit_protocol_t *buffer, int *type_expected);
 int isSourceExpected(kermit_protocol_t *buffer, int source_expected);
 
 void communicationBetweenProcess(int socket, int destination_address, int source_address, int type, char *message, int initial_line, int end_line, int *codes_accepted);
+
+int calculateBufferParity(kermit_protocol_t *buffer);
+
+int compareBufferParity(kermit_protocol_t *buffer);
+
 #endif

@@ -38,6 +38,7 @@ kermit_protocol_t *defineProtocol(
     kermit->sequence = sequence;
     kermit->type = type;
     kermit->size = strlen(message);
+    kermit->parity = calculateBufferParity(kermit);
 
     return kermit;
 }
@@ -501,4 +502,30 @@ void communicationBetweenProcess(int socket, int destination_address, int source
     } while(isNack(received_code));
 
     printf("%s\n", message_from_another_process);
+}
+
+int calculateBufferParity(kermit_protocol_t *buffer){
+    int size_message = buffer->size;
+    unsigned int buffer_parity;
+    
+    buffer_parity = buffer->size ^ buffer->sequence ^ buffer->type;
+    
+    for(int i = 0; i < size_message; i++){
+        buffer_parity = buffer_parity ^ buffer->data[i];
+    }
+
+    return buffer_parity;
+}
+
+int compareBufferParity(kermit_protocol_t *buffer){
+    int size_message = buffer->size;
+    unsigned int buffer_parity;
+    
+    buffer_parity = buffer->size ^ buffer->sequence ^  buffer->type;
+    
+    for(int i = 0; i < size_message; i++){
+        buffer_parity = buffer_parity ^ buffer->data[i];
+    }
+
+    return buffer->parity == buffer_parity ? 1 : 0;
 }

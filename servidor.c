@@ -56,10 +56,16 @@ int main()
 				received_buffer.type != END_TRANSMISSION &&
 				isMessageFromAnotherProcess(received_code, &received_buffer, CLIENTE) 
 			) {
-				type = received_buffer.type;
-				memcpy(message_from_another_process + buffer_size, received_buffer.data, received_buffer.size);
-				buffer_size += received_buffer.size;
-				sequence++;
+
+				if (compareBufferParity(&received_buffer)) {
+					type = received_buffer.type;
+					memcpy(message_from_another_process + buffer_size, received_buffer.data, received_buffer.size);
+					buffer_size += received_buffer.size;
+					sequence++;
+				}else {
+					sendMessage(socket, CLIENTE, SERVIDOR, NACK_CODE, "", 0);
+					sequence = 0;
+				}
 			}
 		} while (received_buffer.type != END_TRANSMISSION || received_buffer.source_address == SERVIDOR);
 

@@ -111,12 +111,13 @@ int isOnlyInitialLine(int initial_line, int end_line);
 
 int isInitialLineAndEndLine(int initial_line, int end_line);
 
-int receiveMessageFromAnotherProcess(int socket, int expected_type, char **message_from_another_process,  int source_expected, int destination_expected);
+int receiveMessageFromAnotherProcess(int socket, int *expected_type, char **message_from_another_process,  int source_expected, int destination_expected);
 
 int isEndTransmission(kermit_protocol_t *buffer);
 
-int isTypeExpected(kermit_protocol_t *buffer, int type_expected);
+int isTypeExpected(kermit_protocol_t *buffer, int *type_expected);
 
 int isSourceExpected(kermit_protocol_t *buffer, int source_expected);
 
+void communicationBetweenProcess(int socket, int destination_address, int source_address, int type, char *message, int initial_line, int end_line, int *codes_accepted);
 #endif

@@ -228,6 +228,11 @@ int isAck(int type)
     return type == ACK_CODE ? 1 : 0;
 }
 
+int isError(int type)
+{
+    return type == ERROR ? 1 : 0;
+}
+
 int isNack(int type) 
 {
     return type == NACK_CODE ? 1 : 0;
@@ -239,7 +244,7 @@ char *concatInitialLine(char *message, int initial_line)
     char initial_line_string[10];
     int size_of_initial_line = sizeof(initial_line_string);
     
-    sprintf(initial_line_string, "%d", initial_line);
+    sprintf(initial_line_string, "%d ", initial_line);
     size_of_initial_line = sizeof(initial_line_string);
     
     memset(new_message, 0, sizeof(new_message));
@@ -259,7 +264,7 @@ char *concatInitialLineAndEndLine(char *message, int initial_line, int end_line)
     sprintf(initial_line_string, "%d ", initial_line);
     size_of_initial_line = sizeof(initial_line_string);
     
-    sprintf(end_line_string, "%d", end_line);
+    sprintf(end_line_string, "%d ", end_line);
     size_of_end_line = sizeof(end_line_string);
     
     memset(new_message, 0, sizeof(new_message));
@@ -414,7 +419,7 @@ int isInitialLineAndEndLine(int initial_line, int end_line)
     return initial_line != NOT_SEND_LINES && end_line != NOT_SEND_LINES ? 1 : 0;
 }
 
-int receiveMessageFromAnotherProcess(int socket, int expected_type, char **message_from_another_process, int source_expected, int destionation_expected)
+int receiveMessageFromAnotherProcess(int socket, int *expected_type, char **message_from_another_process, int source_expected, int destionation_expected)
 {
     kermit_protocol_t *received_buffer = (kermit_protocol_t *)calloc(1, sizeof(kermit_protocol_t));
     *message_from_another_process = (char *)calloc(1024 * 4, sizeof(char));
@@ -423,15 +428,15 @@ int receiveMessageFromAnotherProcess(int socket, int expected_type, char **messa
     int buffer_size = 0;
     int isReceived = 0;
 
-    // do{
-    //     received_code = getMessageFromAnotherProcess(socket, received_buffer);
-    //     received_code = getMessageFromAnotherProcess(socket, received_buffer);
+    do{
+        received_code = getMessageFromAnotherProcess(socket, received_buffer);
+        received_code = getMessageFromAnotherProcess(socket, received_buffer);
 
-    //     if (isNack(received_buffer->type)) {
-    //         return NACK_CODE;
-    //     }
+        if (isNack(received_buffer->type)) {
+            return NACK_CODE;
+        }
 
-    // }while(!isAck(received_buffer->type));
+    }while(!isAck(received_buffer->type) && !isError(received_buffer->type));
 
     do{	
         received_code = getMessageFromAnotherProcess(socket, received_buffer);
@@ -453,12 +458,37 @@ int isEndTransmission(kermit_protocol_t *buffer)
     return buffer->type == END_TRANSMISSION ? 1 : 0;
 }
 
-int isTypeExpected(kermit_protocol_t *buffer, int type_expected)
+int isTypeExpected(kermit_protocol_t *buffer, int *type_expected)
 {
-    return buffer->type == type_expected ? 1 : 0;
+    int number_of_types = sizeof(type_expected)/4;
+
+    for (int i = 0; i < number_of_types; i++) {
+        if (buffer->type == type_expected[i]) {
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 int isSourceExpected(kermit_protocol_t *buffer, int source_expected)
 {
     return buffer->source_address == source_expected ? 1 : 0;
+}
+
+void communicationBetweenProcess(int socket, int destination_address, int source_address, int type, char *message, int initial_line, int end_line, int *codes_accepted)
+{
+    int received_code;
+    char *message_from_another_process = (char *)calloc(1024 * 4, sizeof(char));
+    do {
+        sendMessageBiggerThenFifteenBits(socket, destination_address, source_address, type, message, initial_line, end_line);
+        received_code = receiveMessageFromAnotherProcess(socket, codes_accepted, &message_from_another_process, source_address, destination_address);
+        
+        if (isNack(received_code)) {
+            printf("Falha ao transmitir a mensagem. Reenviando a mensagem\n");
+        }
+
+    } while(isNack(received_code));
+
+    printf("%s\n", message_from_another_process);
 }

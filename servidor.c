@@ -69,15 +69,13 @@ int main()
 			setColorDefault();
 			directory_items = getItemsFromDirectory();
 
-			//send ACK_CODE
-
-
+			sendMessage(socket, CLIENTE, SERVIDOR, ACK_CODE, "", NO_SEQUENCE);
 			sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, CONTENT_LIST_DIRECTORY, directory_items, NOT_SEND_LINES , NOT_SEND_LINES);
 		}
 
 		if (isChangeDirectoryCommand(type)) {
 			setColorBlue();
-			printf("Command \"cd\" to \"%s\"received\n", message_from_another_process);
+			printf("Command \"cd\" to \"%s\" received\n", message_from_another_process);
 			setColorDefault();
 			received_code = changeDirectory(message_from_another_process, SERVIDOR);
 			printf("Caminho atual: ");
@@ -87,9 +85,8 @@ int main()
 			);
 
 			if (received_code == 0) {
-				//send ACK_CODE
-				//send NOTHING
-				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ACK_CODE, "", NOT_SEND_LINES ,NOT_SEND_LINES);
+				sendMessage(socket, CLIENTE, SERVIDOR, ACK_CODE, "", NO_SEQUENCE);
+				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, NOP_CODE_1, "", NOT_SEND_LINES ,NOT_SEND_LINES);
 			}else {
 				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Falha ao mudar de diretório", NOT_SEND_LINES ,NOT_SEND_LINES);
 			}
@@ -97,7 +94,7 @@ int main()
 
 		if (isVerCommand(type)) {
 			setColorBlue();
-			printf("Command \"ver\" file \"%s\"received\n", message_from_another_process);
+			printf("Command \"ver\" file \"%s\" received\n", message_from_another_process);
 			setColorDefault();
 			
 			char *ver_content;
@@ -107,7 +104,7 @@ int main()
 			if (received_code == -1) {
 				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Arquivo não encontrado", NOT_SEND_LINES ,NOT_SEND_LINES);
 			}else {
-				//send ACK_CODE
+				sendMessage(socket, CLIENTE, SERVIDOR, ACK_CODE, "", NO_SEQUENCE);
 				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, CONTENT_SEE_FILE, ver_content, NOT_SEND_LINES ,NOT_SEND_LINES);
 			}
 		}
@@ -126,7 +123,7 @@ int main()
 			received_code = seeLineContentServerInClient(line, message_from_another_process, &linha_content);
 			
 			if (received_code != -1) {
-				//send ACK_CODE
+				sendMessage(socket, CLIENTE, SERVIDOR, ACK_CODE, "", NO_SEQUENCE);
 				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, CONTENT_SEE_FILE, linha_content, NOT_SEND_LINES ,NOT_SEND_LINES);
 			}else {
 				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Arquivo não encontrado", NOT_SEND_LINES ,NOT_SEND_LINES);
@@ -146,7 +143,7 @@ int main()
 			received_code = seeIntervalContentServerInClient(line, end_line, message_from_another_process, &linhas_content);
 			
 			if (received_code != -1) {
-				//send ACK_CODE
+				sendMessage(socket, CLIENTE, SERVIDOR, ACK_CODE, "", NO_SEQUENCE);
 				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, CONTENT_SEE_FILE, linhas_content, NOT_SEND_LINES ,NOT_SEND_LINES);
 			}else {
 				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Arquivo não encontrado", NOT_SEND_LINES ,NOT_SEND_LINES);
@@ -157,18 +154,17 @@ int main()
 			setColorBlue();
 			printf("Command \"edit\" received\n");
 			setColorDefault();
+
 			char *file_name;
-
+	
 			line = getLineFromString(&message_from_another_process);
-			
 			file_content = getFileFromString(message_from_another_process);
-			file_content += 1;
-
 			file_name = message_from_another_process;
 
 			int number_file_lines = countFileLines(file_name);
 
 
+			printf("file = %s\nline = %d\ncontent = %s\n", file_name, line, file_content);
 			if (number_file_lines == -1) {
 				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "O arquivo não existe", NOT_SEND_LINES ,NOT_SEND_LINES);
 			}else if (line > number_file_lines) {
@@ -178,9 +174,8 @@ int main()
 				if (editContentFileInServer(file_name, line, file_content) == ERROR) {
 					sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "O arquivo não existe", NOT_SEND_LINES ,NOT_SEND_LINES);
 				}else {
-					//send ACK_CODE
-					//send nothing
-					sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ACK_CODE, "Arquivo editado com sucesso", NOT_SEND_LINES ,NOT_SEND_LINES);
+					sendMessage(socket, CLIENTE, SERVIDOR, ACK_CODE, "", NO_SEQUENCE);
+					sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, NOP_CODE_1, "Arquivo editado com sucesso", NOT_SEND_LINES ,NOT_SEND_LINES);
 
 				}
 			}

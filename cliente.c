@@ -89,57 +89,45 @@ int main()
 			kermit_protocol_t received_buffer;
 
 			if (isListDirectoryCommand(type)) {
-				do {
-					sendMessageBiggerThenFifteenBits(socket, SERVIDOR, CLIENTE, LIST_DIRECTORY_CODE, "", NOT_SEND_LINES, NOT_SEND_LINES);
-					received_code = receiveMessageFromAnotherProcess(socket, CONTENT_LIST_DIRECTORY, &message_from_another_process, CLIENTE, SERVIDOR);
-				} while(isNack(received_code));
-				printf("%s\n", message_from_another_process);
 
+				int codes_accepted[2] = {CONTENT_LIST_DIRECTORY, ERROR};
+
+				communicationBetweenProcess(socket, SERVIDOR, CLIENTE, LIST_DIRECTORY_CODE, "", NOT_SEND_LINES, NOT_SEND_LINES, codes_accepted);
 			}
 
 			if (isChangeDirectoryCommand(type)) {
 				scanf("%s", directory);
-				do {
-					sendMessageBiggerThenFifteenBits(socket, SERVIDOR, CLIENTE, CHANGE_DIRECTORY_CODE, directory, NOT_SEND_LINES ,NOT_SEND_LINES);
-					received_code = receiveMessageFromAnotherProcess(socket, ACK_CODE, &message_from_another_process, CLIENTE, SERVIDOR);
-				} while(isNack(received_code));
 
-				printf("%s\n", message_from_another_process);
+				int codes_accepted[2] = {NOP_CODE_1, ERROR};
+				
+				communicationBetweenProcess(socket, SERVIDOR, CLIENTE, CHANGE_DIRECTORY_CODE, directory, NOT_SEND_LINES, NOT_SEND_LINES, codes_accepted);
 			}
 
 			if (isVerCommand(type)) {
 				scanf("%s", file);
 				
-				do {
-					sendMessageBiggerThenFifteenBits(socket, SERVIDOR, CLIENTE, SEE_FILE_SERVER_CODE, file, NOT_SEND_LINES, NOT_SEND_LINES);
-					received_code = receiveMessageFromAnotherProcess(socket, CONTENT_SEE_FILE, &message_from_another_process, CLIENTE, SERVIDOR);
-				} while(isNack(received_code));
+				int codes_accepted[2] = {CONTENT_SEE_FILE, ERROR};
 
-				printf("%s\n", message_from_another_process);
+				communicationBetweenProcess(socket, SERVIDOR, CLIENTE, SEE_FILE_SERVER_CODE, file, NOT_SEND_LINES, NOT_SEND_LINES, codes_accepted);
 			}
 
 			if (isLinhaCommand(type)) {
 				scanf("%d", &initial_line);
 				scanf("%[^\n]s", file);
 				
-				do {
-					sendMessageBiggerThenFifteenBits(socket, SERVIDOR, CLIENTE, SEE_LINE_FILE_SERVER_CODE, file, initial_line, NOT_SEND_LINES);
-					received_code = receiveMessageFromAnotherProcess(socket, CONTENT_SEE_FILE, &message_from_another_process, CLIENTE, SERVIDOR);
-				} while(isNack(received_code));
+				int codes_accepted[2] = {CONTENT_SEE_FILE, ERROR};
 
-				printf("%s\n", message_from_another_process);
+				communicationBetweenProcess(socket, SERVIDOR, CLIENTE, SEE_LINE_FILE_SERVER_CODE, file, initial_line, NOT_SEND_LINES, codes_accepted);
 			}
 
 			if (isLinhasCommand(type)) {
 				scanf("%d", &initial_line);
 				scanf("%d", &final_line);
 				scanf("%[^\n]s", file);
-				do{
-					sendMessageBiggerThenFifteenBits(socket, SERVIDOR, CLIENTE, SEE_LINES_FILE_SERVER_CODE, file, initial_line, final_line);
-					received_code = receiveMessageFromAnotherProcess(socket, CONTENT_SEE_FILE, &message_from_another_process, CLIENTE, SERVIDOR);
-				} while(isNack(received_code));
+				
+				int codes_accepted[2] = {CONTENT_SEE_FILE, ERROR};
 
-				printf("%s\n", message_from_another_process);
+				communicationBetweenProcess(socket, SERVIDOR, CLIENTE, SEE_LINES_FILE_SERVER_CODE, file, initial_line, final_line, codes_accepted);
 			}
 
 			if (isEditCommand(type)) {
@@ -147,16 +135,11 @@ int main()
 				scanf("%s", file);
 				scanf("%[^\n]s", file_content);
 
-				strcat(file, " ");
 				strcat(file, file_content);
-				
-				do {
-
-					sendMessageBiggerThenFifteenBits(socket, SERVIDOR, CLIENTE, EDIT_LINES_FILE_SERVER_CODE, file, initial_line, NOT_SEND_LINES);
-					received_code = receiveMessageFromAnotherProcess(socket, ACK_CODE, &message_from_another_process, CLIENTE, SERVIDOR);
-				}while(isNack(received_code));
-
-				printf("%s\n", message_from_another_process);
+				int codes_accepted[2] = {NOP_CODE_1, ERROR};
+			
+				printf("%s\n", file);
+				communicationBetweenProcess(socket, SERVIDOR, CLIENTE, EDIT_LINES_FILE_SERVER_CODE, file, initial_line, NOT_SEND_LINES, codes_accepted);
 			}			
 		}
 	}

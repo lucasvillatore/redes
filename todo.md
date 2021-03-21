@@ -1,7 +1,7 @@
 - [x] arrumar receber a mensagem
 - [x] implementar o edit
 - [ ] colocar um verificador de paridade
-- [ ] re enviar a mensagem caso de nack
+- [x] re enviar a mensagem caso de nack
 - [x] implementar o erro
 - [ ] timeout
 - [ ] implementar a parada de não ter linha no arquivo

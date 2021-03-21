@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "string.h": "c",
+        "stdlib.h": "c",
+        "servidorutilities.h": "c",
+        "commonfunctions.h": "c",
+        "ioctl.h": "c",
+        "typeinfo": "c"
+    }
+}

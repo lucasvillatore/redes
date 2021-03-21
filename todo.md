@@ -4,7 +4,7 @@
 - [x] re enviar a mensagem caso de nack
 - [x] implementar o erro
 - [ ] timeout
-- [ ] implementar a parada de não ter linha no arquivo
+- [x] implementar a parada de não ter linha no arquivo
 
 
 lucas do futuro vc precisa arrumar o receber mensagem que ta quase pronto (basicamente colocar numa função

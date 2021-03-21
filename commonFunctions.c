@@ -244,7 +244,7 @@ char *concatInitialLine(char *message, int initial_line)
     char initial_line_string[10];
     int size_of_initial_line = sizeof(initial_line_string);
     
-    sprintf(initial_line_string, "%d ", initial_line);
+    sprintf(initial_line_string, "%d", initial_line);
     size_of_initial_line = sizeof(initial_line_string);
     
     memset(new_message, 0, sizeof(new_message));
@@ -264,7 +264,7 @@ char *concatInitialLineAndEndLine(char *message, int initial_line, int end_line)
     sprintf(initial_line_string, "%d ", initial_line);
     size_of_initial_line = sizeof(initial_line_string);
     
-    sprintf(end_line_string, "%d ", end_line);
+    sprintf(end_line_string, "%d", end_line);
     size_of_end_line = sizeof(end_line_string);
     
     memset(new_message, 0, sizeof(new_message));
@@ -432,7 +432,7 @@ int receiveMessageFromAnotherProcess(int socket, int *expected_type, char **mess
         received_code = getMessageFromAnotherProcess(socket, received_buffer);
         received_code = getMessageFromAnotherProcess(socket, received_buffer);
 
-        if (isNack(received_buffer->type)) {
+        if (isNack(received_buffer->type) && isMessageFromAnotherProcess(received_code, received_buffer, SERVIDOR)) {
             return NACK_CODE;
         }
 

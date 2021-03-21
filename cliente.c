@@ -136,10 +136,14 @@ int main()
 				scanf("%[^\n]s", file_content);
 
 				strcat(file, file_content);
+				char tmp[1024 *4];
+				memset(tmp, 0, 1024 * 4);
+				memcpy(tmp, " \0", sizeof(" \0"));
+				memcpy(tmp + strlen(tmp), file, strlen(file));
+
 				int codes_accepted[2] = {NOP_CODE_1, ERROR};
 			
-				printf("%s\n", file);
-				communicationBetweenProcess(socket, SERVIDOR, CLIENTE, EDIT_LINES_FILE_SERVER_CODE, file, initial_line, NOT_SEND_LINES, codes_accepted);
+				communicationBetweenProcess(socket, SERVIDOR, CLIENTE, EDIT_LINES_FILE_SERVER_CODE, tmp, initial_line, NOT_SEND_LINES, codes_accepted);
 			}			
 		}
 	}

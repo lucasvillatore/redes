@@ -75,7 +75,7 @@ int main()
 
 		if (isChangeDirectoryCommand(type)) {
 			setColorBlue();
-			printf("Command \"cd\" to \"%s\" received\n", message_from_another_process);
+			printf("Command \"cd\" to \"%s\"received\n", message_from_another_process);
 			setColorDefault();
 			received_code = changeDirectory(message_from_another_process, SERVIDOR);
 			printf("Caminho atual: ");
@@ -110,7 +110,6 @@ int main()
 		}
 
 		if (isLinhaCommand(type)) {
-
 			line = getLineFromString(&message_from_another_process);
 			getFileFromString(message_from_another_process);
 
@@ -120,13 +119,19 @@ int main()
 
 			char *linha_content;
 
-			received_code = seeLineContentServerInClient(line, message_from_another_process, &linha_content);
-			
-			if (received_code != -1) {
-				sendMessage(socket, CLIENTE, SERVIDOR, ACK_CODE, "", NO_SEQUENCE);
-				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, CONTENT_SEE_FILE, linha_content, NOT_SEND_LINES ,NOT_SEND_LINES);
-			}else {
-				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Arquivo não encontrado", NOT_SEND_LINES ,NOT_SEND_LINES);
+			int number_file_lines = countFileLines(message_from_another_process);
+
+			if (number_file_lines < line) {
+				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Arquivo não possui a linha desejada", NOT_SEND_LINES ,NOT_SEND_LINES);
+			}else{
+				received_code = seeLineContentServerInClient(line, message_from_another_process, &linha_content);
+				
+				if (received_code != -1) {
+					sendMessage(socket, CLIENTE, SERVIDOR, ACK_CODE, "", NO_SEQUENCE);
+					sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, CONTENT_SEE_FILE, linha_content, NOT_SEND_LINES ,NOT_SEND_LINES);
+				}else {
+					sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Arquivo não encontrado", NOT_SEND_LINES ,NOT_SEND_LINES);
+				}
 			}
 
 		}
@@ -140,13 +145,22 @@ int main()
 
 			char *linhas_content;
 
-			received_code = seeIntervalContentServerInClient(line, end_line, message_from_another_process, &linhas_content);
-			
-			if (received_code != -1) {
-				sendMessage(socket, CLIENTE, SERVIDOR, ACK_CODE, "", NO_SEQUENCE);
-				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, CONTENT_SEE_FILE, linhas_content, NOT_SEND_LINES ,NOT_SEND_LINES);
-			}else {
-				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Arquivo não encontrado", NOT_SEND_LINES ,NOT_SEND_LINES);
+			int number_file_lines = countFileLines(message_from_another_process);
+
+			if (line > number_file_lines || end_line > number_file_lines) {
+				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Arquivo não possui a linha desejada", NOT_SEND_LINES, NOT_SEND_LINES);
+			}
+			else if(line > end_line){
+				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Não é possível mostrar esse intervalo", NOT_SEND_LINES, NOT_SEND_LINES);
+			}else{
+
+				received_code = seeIntervalContentServerInClient(line, end_line, message_from_another_process, &linhas_content);
+				if (received_code != -1) {
+					sendMessage(socket, CLIENTE, SERVIDOR, ACK_CODE, "", NO_SEQUENCE);
+					sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, CONTENT_SEE_FILE, linhas_content, NOT_SEND_LINES, NOT_SEND_LINES);
+				}else {
+					sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Arquivo não encontrado", NOT_SEND_LINES, NOT_SEND_LINES);
+				}
 			}
 		}
 

@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <time.h>
 
 const char CHANGE_DIRECTORY_SERVER_STRING[] = "cd";
 
@@ -428,6 +429,10 @@ int receiveMessageFromAnotherProcess(int socket, int *expected_type, char **mess
     int buffer_size = 0;
     int isReceived = 0;
 
+    time_t start_time, end_time;
+    double diff_between_start_end;
+    time(&start_time);
+    
     do{
         received_code = getMessageFromAnotherProcess(socket, received_buffer);
         received_code = getMessageFromAnotherProcess(socket, received_buffer);
@@ -435,7 +440,12 @@ int receiveMessageFromAnotherProcess(int socket, int *expected_type, char **mess
         if (isNack(received_buffer->type) && isMessageFromAnotherProcess(received_code, received_buffer, SERVIDOR)) {
             return NACK_CODE;
         }
-
+        end_time = time(NULL);
+        diff_between_start_end = difftime(end_time, start_time);
+        if (diff_between_start_end > 5) {
+            printf("Timeout, exiting with code\n");
+            exit(1);
+        }
     }while(!isAck(received_buffer->type) && !isError(received_buffer->type));
 
     do{	

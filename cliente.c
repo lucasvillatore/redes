@@ -93,7 +93,6 @@ int main()
 					sendMessageBiggerThenFifteenBits(socket, SERVIDOR, CLIENTE, LIST_DIRECTORY_CODE, "", NOT_SEND_LINES, NOT_SEND_LINES);
 					received_code = receiveMessageFromAnotherProcess(socket, CONTENT_LIST_DIRECTORY, &message_from_another_process, CLIENTE, SERVIDOR);
 				} while(isNack(received_code));
-
 				printf("%s\n", message_from_another_process);
 
 			}
@@ -101,7 +100,7 @@ int main()
 			if (isChangeDirectoryCommand(type)) {
 				scanf("%s", directory);
 				do {
-					sendMessageBiggerThenFifteenBits(socket, SERVIDOR, CLIENTE, ACK_CODE, directory, NOT_SEND_LINES ,NOT_SEND_LINES);
+					sendMessageBiggerThenFifteenBits(socket, SERVIDOR, CLIENTE, CHANGE_DIRECTORY_CODE, directory, NOT_SEND_LINES ,NOT_SEND_LINES);
 					received_code = receiveMessageFromAnotherProcess(socket, ACK_CODE, &message_from_another_process, CLIENTE, SERVIDOR);
 				} while(isNack(received_code));
 

@@ -424,7 +424,7 @@ int isInitialLineAndEndLine(int initial_line, int end_line)
 int receiveMessageFromAnotherProcess(int socket, int *expected_type, char **message_from_another_process, int source_expected, int destionation_expected)
 {
     kermit_protocol_t *received_buffer = (kermit_protocol_t *)calloc(1, sizeof(kermit_protocol_t));
-    *message_from_another_process = (char *)calloc(1024 * 4, sizeof(char));
+    *message_from_another_process = (char *)calloc(1024 * 1024, sizeof(char));
 
     int received_code;
     int buffer_size = 0;
@@ -444,6 +444,7 @@ int receiveMessageFromAnotherProcess(int socket, int *expected_type, char **mess
         end_time = time(NULL);
         diff_between_start_end = difftime(end_time, start_time);
         if (diff_between_start_end > 5) {
+            free(*message_from_another_process);
             printf("Timeout, exiting with code\n");
             exit(1);
         }
@@ -489,7 +490,7 @@ int isSourceExpected(kermit_protocol_t *buffer, int source_expected)
 void communicationBetweenProcess(int socket, int destination_address, int source_address, int type, char *message, int initial_line, int end_line, int *codes_accepted)
 {
     int received_code;
-    char *message_from_another_process = (char *)calloc(1024 * 4, sizeof(char));
+    char *message_from_another_process = (char *)calloc(1024 * 1024, sizeof(char));
     do {
         sendMessageBiggerThenFifteenBits(socket, destination_address, source_address, type, message, initial_line, end_line);
         received_code = receiveMessageFromAnotherProcess(socket, codes_accepted, &message_from_another_process, source_address, destination_address);
@@ -501,6 +502,7 @@ void communicationBetweenProcess(int socket, int destination_address, int source
     } while(isNack(received_code));
 
     printf("%s\n", message_from_another_process);
+    free(message_from_another_process);
 }
 
 int calculateBufferParity(kermit_protocol_t *buffer){

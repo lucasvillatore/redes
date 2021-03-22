@@ -39,7 +39,7 @@ char *getItemsFromDirectory()
 {
     DIR *d;
     d = opendir("./");
-    char *listItems = (char *)calloc(1024*4, sizeof(char));
+    char *listItems = (char *)calloc(1024 * 100, sizeof(char));
     if (d){
 
         struct dirent *dir;
@@ -77,7 +77,8 @@ int seeContentFileServerInClient(char *file, char **file_return)
     char line_to_append_in_buffer[270];
     char file_line_string[10];
     
-    *file_return = (char *)calloc(1024*10, sizeof(char));
+    printf("chego aqui\n");
+    *file_return = (char *)calloc(1024 * 1024, sizeof(char));
 
     while (fgets(line, 256, file_content)) {
         memset(line_to_append_in_buffer, 0, 270);
@@ -91,6 +92,7 @@ int seeContentFileServerInClient(char *file, char **file_return)
         strcat(*file_return, line_to_append_in_buffer);
         file_line++;
     }
+    printf("chego aqui\n");
 
     fclose(file_content);
 
@@ -156,7 +158,7 @@ int seeLineContentServerInClient(int line, char* file, char **buffer)
     char current_line[256];
     memset(current_line, 0, 256);
 
-    *buffer = (char *)calloc(1024 * 4, sizeof(char));
+    *buffer = (char *)calloc(1024 * 100, sizeof(char));
 
     while (fgets(current_line, 256, file_content)) {
         lines++;
@@ -200,7 +202,7 @@ int editContentFileInServer(char *file_name, int line, char *new_message)
 
 char *getCopyOfEntireFileWithNewMessage(FILE *file, int line, char *new_message)
 {
-    char *entire_file = (char *)calloc(1024 * 10, sizeof(char *));
+    char *entire_file = (char *)calloc(1024 * 100, sizeof(char *));
     char *string_to_concate;
     char file_line[256];
 

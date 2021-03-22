@@ -25,6 +25,7 @@ O trabalho possui o seguinte fluxo:
 
 Nesse trabalho, a comunicação entre Cliente - Servidor, é utilizado o protocolo Kermit Simplificado. O protocolo possui os campos de marcador de início, endereço de destino, endereço de origem, tamanho da mensagem, número da mensagem (sequência), o tipo da mensagem, os dados (de máximo de 15 em 15 bytes o envio da mensagem) e o campo de paridade.  
 Foi utilizado "para e espera" para envio de mensagens.  
+O Timeout mata o programa se o cliente ou o servidor ficarem no minimo 5 segundos sem receber alguma resposta.  
 Nesse trabalho não consegui implementar 100% o "para e espera" para o envio de mensagens, ao invés de enviar um ACK após receber cada mensagem, é enviado somente a cada comando. Eu notei que deveria enviar um ACK a cada mensagem um pouco antes da data final de entrega do trabalho, eu teria que mudar grande parte do envio e recebimento de mensagens para suportar essa mudança, assim eu não consegui fazer essa alteração.  
 Apesar desse incidente, consegui implementar todos os comandos, verificar a paridade do protocolo, implementar o timeout, tratar os códigos de erros e o reenvio da mensagem caso NACK ocorra.
 

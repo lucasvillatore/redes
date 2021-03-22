@@ -449,17 +449,16 @@ int receiveMessageFromAnotherProcess(int socket, int *expected_type, char **mess
         }
     }while(!isAck(received_buffer->type) && !isError(received_buffer->type));
 
-    do{	
-        received_code = getMessageFromAnotherProcess(socket, received_buffer);
-        received_code = getMessageFromAnotherProcess(socket, received_buffer);
-        
+    while(!isEndTransmission(received_buffer) || isSourceExpected(received_buffer, source_expected) || !isReceived) {
         if (isMessageFromAnotherProcess(received_code, received_buffer, SERVIDOR) && !isEndTransmission(received_buffer) && isTypeExpected(received_buffer, expected_type)){
             memcpy(*message_from_another_process + buffer_size, received_buffer->data, received_buffer->size);
             buffer_size += received_buffer->size;
             isReceived = 1;
         }
 
-    } while (!isEndTransmission(received_buffer) || isSourceExpected(received_buffer, source_expected) || !isReceived);
+        received_code = getMessageFromAnotherProcess(socket, received_buffer);
+        received_code = getMessageFromAnotherProcess(socket, received_buffer);
+    }
 
     return 1;
 }

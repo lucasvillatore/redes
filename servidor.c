@@ -94,7 +94,7 @@ int main()
 				sendMessage(socket, CLIENTE, SERVIDOR, ACK_CODE, "", NO_SEQUENCE);
 				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, NOP_CODE_1, "", NOT_SEND_LINES ,NOT_SEND_LINES);
 			}else {
-				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Falha ao mudar de diretório", NOT_SEND_LINES ,NOT_SEND_LINES);
+				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Erro, não foi possível alterar de pasta", NOT_SEND_LINES ,NOT_SEND_LINES);
 			}
 		}
 
@@ -128,7 +128,7 @@ int main()
 			int number_file_lines = countFileLines(message_from_another_process);
 
 			if (number_file_lines < line) {
-				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Arquivo não possui a linha desejada", NOT_SEND_LINES ,NOT_SEND_LINES);
+				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Não existe essa linha no arquivo", NOT_SEND_LINES ,NOT_SEND_LINES);
 			}else{
 				received_code = seeLineContentServerInClient(line, message_from_another_process, &linha_content);
 				
@@ -154,10 +154,10 @@ int main()
 			int number_file_lines = countFileLines(message_from_another_process);
 
 			if (line > number_file_lines || end_line > number_file_lines) {
-				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Arquivo não possui a linha desejada", NOT_SEND_LINES, NOT_SEND_LINES);
+				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Linha inicial ou linha final maior que o número de linhas do arquivo", NOT_SEND_LINES, NOT_SEND_LINES);
 			}
 			else if(line > end_line){
-				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Não é possível mostrar esse intervalo", NOT_SEND_LINES, NOT_SEND_LINES);
+				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Linha inicial maior que a linha final", NOT_SEND_LINES, NOT_SEND_LINES);
 			}else{
 
 				received_code = seeIntervalContentServerInClient(line, end_line, message_from_another_process, &linhas_content);
@@ -184,15 +184,14 @@ int main()
 			int number_file_lines = countFileLines(file_name);
 
 
-			printf("file = %s\nline = %d\ncontent = %s\n", file_name, line, file_content);
 			if (number_file_lines == -1) {
-				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "O arquivo não existe", NOT_SEND_LINES ,NOT_SEND_LINES);
+				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Arquivo não encontrado", NOT_SEND_LINES ,NOT_SEND_LINES);
 			}else if (line > number_file_lines) {
-				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "O arquivo não possui a linha desejada", NOT_SEND_LINES ,NOT_SEND_LINES);
+				sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Linha não encontrada", NOT_SEND_LINES ,NOT_SEND_LINES);
 			}else {
 				strcat(file_content, "\n");
 				if (editContentFileInServer(file_name, line, file_content) == ERROR) {
-					sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "O arquivo não existe", NOT_SEND_LINES ,NOT_SEND_LINES);
+					sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, ERROR, "Arquivo não encontrado", NOT_SEND_LINES ,NOT_SEND_LINES);
 				}else {
 					sendMessage(socket, CLIENTE, SERVIDOR, ACK_CODE, "", NO_SEQUENCE);
 					sendMessageBiggerThenFifteenBits(socket, CLIENTE, SERVIDOR, NOP_CODE_1, "Arquivo editado com sucesso", NOT_SEND_LINES ,NOT_SEND_LINES);
